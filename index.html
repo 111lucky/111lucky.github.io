@@ -186,7 +186,6 @@
       <p id="resMatch"></p>
     </div>
 
-    <!-- 详细建议（分场景） -->
     <div class="content-card advice">
       <h3><span class="ico">🚀</span>可落地提升建议</h3>
       <div id="resAdviceDetailed"></div>
@@ -213,7 +212,7 @@
 
 <script>
 /* =========================================================
-   一、题库（45题）
+   一、题库（45题，每题4选项，分值A=1/B=2/C=3/D=4）
    ========================================================= */
 const QUESTIONS = [
   { q: "朋友约你周末出门，但你那天其实只想躺着。你会：", opts: [
@@ -354,7 +353,7 @@ const QUESTIONS = [
 ];
 
 /* =========================================================
-   二、六种人格数据（含分场景详细建议）
+   二、六种人格数据
    ========================================================= */
 const PERSONALITIES = {
   lina: {
@@ -728,7 +727,7 @@ function prevQuestion() {
 }
 
 /* =========================================================
-   六、结果展示（含分场景详细建议渲染）
+   六、结果展示
    ========================================================= */
 const SCENE_META = {
   social:   { title: "社交场景 · 怎么跟人相处", ico: "💬" },
@@ -784,7 +783,6 @@ function showResult() {
   $("resTag").style.color = p.color;
   $("resScore").textContent = totalScore;
 
-  // 图表
   const chart = $("chartBars");
   chart.innerHTML = "";
   const dimOrder = ["直给力","蓄力感","傲娇度","目标感","边界感","热忱值"];
@@ -820,7 +818,6 @@ function showResult() {
 
   $("resMatch").textContent = p.match;
 
-  // 详细分场景建议
   renderDetailedAdvice(p);
 
   state.resultPersonality = p;

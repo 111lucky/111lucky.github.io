@@ -211,9 +211,9 @@
 
 <script>
 /* =========================================================
-   一、题库（45题）
+   一、题库（45题，每题4选项，分值固定 1-4）
    ========================================================= */
-const QUESTIONS = [
+var QUESTIONS = [
   { q: "朋友约你周末出门，但你那天其实只想躺着。你会：", opts: [
     { t: "直接说“不想动，改天吧”", v: 1 }, { t: "纠结一会儿，最后还是去了", v: 2 },
     { t: "找个借口推掉，心里有点过意不去", v: 3 }, { t: "去，但全程盼着早点回家", v: 4 } ]},
@@ -352,498 +352,390 @@ const QUESTIONS = [
 ];
 
 /* =========================================================
-   二、六种人格数据
+   二、六种人格数据（完整补全，确保所有结果可渲染）
    ========================================================= */
-const PERSONALITIES = {
+var PERSONALITIES = {
   lina: {
     key: "lina", name: "厉娜型人格", tag: "直给 · 自在 · 不内耗", color: "#4ade80",
-    colorBg: "rgba(74,222,128,.15)", range: [45, 67],
+    range: [45, 67],
     share: "我的社交哲学：饭要按时吃，事不隔夜想。",
-    core: "你是那种“天塌下来先吃饭”的人。情绪来了就表达，表达完就翻篇，不把别人的课题背在自己身上。别人在纠结“他是不是对我有意见”，你已经睡着了。这不是冷漠，是你天生有一种把复杂事情简化成“现在该干嘛”的能力。跟你相处不累，因为你真实、不装、不绕弯。",
-    strengths: [
-      "直给不内耗：喜欢就处，不舒服就说，说完就过，情绪不积压",
-      "自我照顾能力强：该吃吃该睡睡，不会被别人的情绪漩涡卷走",
-      "真实感强：不表演情绪，不刻意讨好，反而让人更容易信任你",
-      "恢复力快：不开心的事睡一觉就翻篇，不反复咀嚼"
+    core: "你是那种“天塌下来先吃饭”的人。情绪来了就表达，表达完就翻篇，不把别人的课题背在自己身上。直来直去是你的保护色，也是你的吸引力——和你相处不累，因为你真实、不装、不演。",
+    strength: ["情绪来得快去得也快，不记隔夜仇", "敢说真话，不内耗，人际关系清爽", "自我边界清晰，不会勉强自己讨好别人", "行动力强，想做什么就去做"],
+    weak: ["有时过于直接，容易误伤敏感的朋友", "对别人的情绪信号不够敏感", "可能被误解为“不在乎”，其实只是表达方式不同"],
+    match: "你适合和“能接住你直球”的人做朋友，比如许飞型或青稚型。他们不玻璃心，也能给你适度的回馈。远离过度敏感、需要反复揣摩的关系。",
+    advice: [
+      { scene: "朋友向你倾诉时", do: "先听完再回应", dont: "急着给方案或打断" },
+      { scene: "情绪上头时", do: "数三秒再开口", dont: "把最伤人的话说出口" },
+      { scene: "长期关系维护", do: "偶尔主动关心一下", dont: "等别人来找你" }
     ],
-    weaks: [
-      "容易忽略别人的敏感信号：对方可能需要一句安慰，而你已经在想下一顿饭了",
-      "表达太直接时可能无意中伤人，自己却意识不到",
-      "对关系的维护偏被动：你觉得“真朋友不用维护”，但有些人需要被主动联系才安心"
-    ],
-    match: "适合跟许飞型做朋友：ta的谨慎和深情会被你的直给治愈，而ta的稳重能帮你兜底那些你懒得处理的细节。也适合跟白小纯型相处，你的不记仇能让ta放下防备。不太适合跟张萌型深度绑定，对方的情感需求密度可能会让你想逃。",
-    advice: {
-      social: [
-        { text: "在“直接说”之前加一句缓冲：“我说个实话你别介意哈”——同样的内容，接受度翻倍。", type: "do" },
-        { text: "拒绝别人时，给一个替代方案：“今天不行，下周我请你吃饭”比干巴巴的“不行”更让人舒服。", type: "do" },
-        { text: "别用“我这人就这样”当挡箭牌。直给是优点，但伤人不是。", type: "dont" }
-      ],
-      emotion: [
-        { text: "你很少内耗，但要留意：有些情绪不是“忘了”而是“压下去了”，偶尔问问自己“我真的没事吗”。", type: "do" },
-        { text: "当朋友明显情绪低落时，不需要你共情，只需要在场：坐在旁边吃饭也可以，但说一句“我在呢”就够了。", type: "do" },
-        { text: "不要用“你想太多了”去回应别人的难过——对你来说不重要的事，对ta可能很重要。", type: "dont" }
-      ],
-      relation: [
-        { text: "每个月主动联系一个你在意的老朋友，哪怕只是发一句“最近咋样”，不需要长聊。", type: "do" },
-        { text: "记住三个朋友的关键日子（生日、重要节点），设个提醒，一条消息就够。", type: "do" },
-        { text: "别把“真朋友不用维护”当真理。关系是活的，长期不浇水准会蔫。", type: "dont" }
-      ],
-      growth: [
-        { text: "你的恢复力是天赋，可以试着把它分享出去：教一个内耗的朋友“睡一觉再说”的方法。", type: "do" },
-        { text: "在团队里主动承担“推动事情往前走”的角色，你的直给在高效率场景里是稀缺能力。", type: "do" },
-        { text: "别把“不在乎”当成熟。适当表达在乎，不会让你变弱，反而让人更靠近你。", type: "dont" }
-      ]
-    }
+    adviceDetail: "给你的建议不是让你变“圆滑”，而是在直率的基础上加一层“缓冲垫”。开口前多问自己一句“这话说出去，对方会怎么接”，能让你少踩很多不必要的坑。"
   },
   xufei: {
-    key: "xufei", name: "许飞型人格", tag: "内敛 · 蓄力 · 重情义", color: "#60a5fa",
-    colorBg: "rgba(96,165,250,.15)", range: [68, 90],
-    share: "我说得少，但我记得多。",
-    core: "你心里有很多没说的话。你不是不在乎，恰恰是太在乎了，所以怕说错、怕被拒绝、怕那份在意被对方看得太清楚。你习惯把情绪攒着，攒到某个时刻用行动一次性表达——比如穿着初见时的衣服出现，比如默默做一件只有自己知道意义的事。你的深情藏在细节里，但很多人没耐心读到那一层。",
-    strengths: [
-      "内敛可靠：答应的事一定做到，不张扬但靠谱",
-      "情感浓度高：对真正在意的人，愿意付出远超对方想象的心力",
-      "有韧性：遇到挫折会自己消化、自己蓄力，不轻易垮掉",
-      "善于观察：你不说，但你什么都看在眼里"
+    key: "xufei", name: "许飞型人格", tag: "独立 · 清醒 · 有分寸", color: "#60a5fa",
+    range: [46, 70],
+    share: "朋友是朋友，我是我，我们互相照亮，但不互相绑架。",
+    core: "你是一个在关系里始终保持清醒的人。你知道自己要什么，也知道自己能给什么。不黏人、不讨好、不越界，但你心里有一杆秤——谁对你好，你都记得。你的独立不是冷漠，而是把热情留给值得的人。",
+    strength: ["边界感极强，不会让关系变成负担", "看人准，不轻易交心但交了就是真朋友", "情绪稳定，不轻易被外界带节奏", "尊重别人的空间，也保护自己的空间"],
+    weak: ["有时显得“不太好接近”，错过一些善意", "心里有事习惯自己扛，容易让关心你的人有距离感", "对关系的要求偏高，容易觉得“没人懂我”"],
+    match: "你适合和同样独立、不黏人的朋友相处，比如厉娜型或白小纯型。你们彼此尊重空间，关键时刻又能靠得住。太需要高频联系的人会让你想逃。",
+    advice: [
+      { scene: "朋友想靠近你时", do: "给一点回应，哪怕只是“谢谢”", dont: "习惯性推开或已读不回" },
+      { scene: "你心里有事时", do: "试着说一句“最近有点累”", dont: "永远说“没事”" },
+      { scene: "判断一段关系", do: "看行动，不只看言语", dont: "因为一次失望就关上门" }
     ],
-    weaks: [
-      "过度压抑表达：期待对方“自己懂”，但大多数人不具备读心能力",
-      "容易在关系里累积委屈：不说 → 失望 → 更不说 → 更失望，循环到某天突然爆发",
-      "对“被看见”的需求很高，但很少主动给别人看见你的机会"
-    ],
-    match: "厉娜型是你的天然互补：ta的直给能撬开你的壳，让你发现“原来直接说出来也没那么可怕”。张萌型的热忱也能带动你，但你需要学会在感到压力时及时喊停，而不是默默忍受然后消失。马天宇型能理解你的边界感，但两个人都不主动的话，关系容易淡掉。",
-    advice: {
-      social: [
-        { text: "练习“小剂量表达”：今天不开心，试着对一个人说“我今天有点低落”，不需要解释原因。", type: "do" },
-        { text: "当你为朋友做了某件事，允许自己轻描淡写地让对方知道。不是邀功，是给ta一个回应你的机会。", type: "do" },
-        { text: "别把“我不说你也该懂”当默契标准。默契是处出来的，不是猜出来的。", type: "dont" }
-      ],
-      emotion: [
-        { text: "给自己设一个“情绪出口”：写日记、录语音、找一个树洞朋友，别让情绪只进不出。", type: "do" },
-        { text: "当你感到委屈时，先问自己：“我是希望ta做什么？”把答案说出来，比让ta猜有效一百倍。", type: "do" },
-        { text: "不要在爆发时才一次性倒出所有旧账——攒着不说，最后伤的是关系也伤自己。", type: "dont" }
-      ],
-      relation: [
-        { text: "如果一个人连续三次让你感到“我不说ta就不懂”，考虑换一种方式：写下来发过去，比当面说容易。", type: "do" },
-        { text: "对真正在意的人，定期做一次“关系体检”：直接问“最近我们之间有没有让你不舒服的地方？”", type: "do" },
-        { text: "别用“消失”来表达不满。对方可能根本不知道你在生气。", type: "dont" }
-      ],
-      growth: [
-        { text: "你的深情是稀缺品，但要学会“限量供应”：先给值得的人，再给愿意回应的人。", type: "do" },
-        { text: "找一个“安全的人”练习表达，从一句“其实我挺在乎你的”开始。", type: "do" },
-        { text: "别把“被看见”当成奢求。你值得被看见，但需要你先掀开一点帘子。", type: "dont" }
-      ]
-    }
-  },
-  baixiaochun: {
-    key: "baixiaochun", name: "白小纯型人格", tag: "傲娇 · 嘴硬 · 心软", color: "#fbbf24",
-    colorBg: "rgba(251,191,36,.15)", range: [91, 112],
-    share: "嘴硬第一名，心软特等奖。",
-    core: "你嘴上说的和心里想的，经常是两回事。明明在意，偏说“无所谓”；明明想和好，偏要刺对方两句。你的傲娇是一种保护色：先表现出不在乎，就不会被看出来受伤。但熟悉你的人都知道，你心软得很快，一句真诚的话就能让你破功。你曾经是那个付出更多的人，所以现在学会了先把刺竖起来。",
-    strengths: [
-      "嘴硬心软：表面锋利，内心其实很容易被打动",
-      "有底线感：被伤害过之后会建立边界，不再无条件付出",
-      "真实不伪装：不开心就写在脸上，不玩阴的",
-      "对真正认可的人，会重新慢慢打开自己"
-    ],
-    weaks: [
-      "口是心非容易把在乎的人推远：对方不知道你是在乎的，只感受到了攻击",
-      "在情绪上头时说话伤人，事后又后悔，但拉不下面子补救",
-      "容易用“我不需要”来掩盖“我想要但怕得不到”"
-    ],
-    match: "青稚型是你的镜子：你们都嘴笨、都后知后觉，但如果你愿意先放下那句“我不在乎”，对方其实一直在等你说真话。厉娜型的直给和不记仇能让你放松，因为你知道ta不会把你的气话当真。马天宇型需要你收起刺，因为ta不会跟你吵，只会直接关门。",
-    advice: {
-      social: [
-        { text: "给自己定一条规则：情绪上头时说的话，十分钟内不发送。十分钟后你还想说，再说。", type: "do" },
-        { text: "练习说“其实我有点在意”——这句话不丢人，它比一百句“无所谓”都更能保护你。", type: "do" },
-        { text: "别用“随便”“都行”来敷衍你在乎的事。敷衍久了，对方就真的不问了。", type: "dont" }
-      ],
-      emotion: [
-        { text: "当你发现自己在用攻击表达在乎时，直接告诉对方：“我刚才说得难听，但我真正想说的是……”", type: "do" },
-        { text: "给自己准备一个“破功开关”：一句真诚的话就能让你软下来，那就允许自己软，不用每次都硬撑。", type: "do" },
-        { text: "别把“心软”当羞耻。你的软是你最珍贵的地方，只是需要配上一点表达技巧。", type: "dont" }
-      ],
-      relation: [
-        { text: "对在乎的人，试着主动发一次“没事，就是想你了”。你会发现天没塌，对方反而很开心。", type: "do" },
-        { text: "吵架后，如果你其实想和好，就给一个很小的台阶：发个表情包、点个赞、问一句“吃饭没”。", type: "do" },
-        { text: "别等着对方先低头。你的“等”在对方眼里可能是“ta根本不在乎”。", type: "dont" }
-      ],
-      growth: [
-        { text: "你的真实和底线感是优点，试着把“刺”和“心”分开表达：刺留着防身，心留给值得的人。", type: "do" },
-        { text: "练习一句万能话术：“我刚才嘴硬了，其实我心里不是这么想的。”", type: "do" },
-        { text: "别把“被伤害过”当成永远竖刺的理由。值得的人，值得你冒一次险。", type: "dont" }
-      ]
-    }
+    adviceDetail: "你的独立是优势，但偶尔露出一点“需要人”的信号，会让真正在意你的人知道往哪走。不用改变自己，只需要把门留一条缝。"
   },
   qingzhi: {
-    key: "qingzhi", name: "青稚型人格", tag: "目标导向 · 后知后觉", color: "#fb923c",
-    colorBg: "rgba(251,146,60,.15)", range: [113, 134],
-    share: "目标在前面，感情在后面，但我回头了。",
-    core: "你是那种“先做事，后想感情”的人。目标在前面，你在后面推着所有人往前走，但走着走着，回头发现有人掉队了，而你不知道什么时候掉的。你不是不在乎，你是后知后觉：事情过了很久，某天突然反应过来“原来那时候ta是那个意思”。你在感情上的反射弧比一般人长，但一旦反应过来，你会认真到让自己难受。",
-    strengths: [
-      "目标感和执行力强：想做的事能推下去，不轻易被情绪拖住",
-      "直来直去不绕弯：你不擅长猜，也不让人猜，效率高",
-      "后知后觉但真反思：一旦意识到自己有问题，会认真复盘",
-      "对认可的人有很强的忠诚感，只是表达方式比较硬"
+    key: "qingzhi", name: "青稚型人格", tag: "细腻 · 共情 · 想太多", color: "#c084fc",
+    range: [47, 72],
+    share: "我总在照顾别人的感受，却常常忘了问问自己累不累。",
+    core: "你有一根特别灵敏的情绪天线。别人还没开口，你已经感觉到了。你习惯先照顾别人的感受，把“不给别人添麻烦”刻进了骨子里。你的温柔是真的，但你的内耗也是真的——因为你太容易把别人的情绪当成自己的责任。",
+    strength: ["共情力极强，是朋友最信赖的倾听者", "心思细腻，能注意到别人忽略的细节", "做事认真负责，答应的事一定做好", "有很强的自我反思能力"],
+    weak: ["过度在意别人的评价，容易委屈自己", "不会拒绝，常常硬撑", "情绪内耗严重，反复琢磨已经发生的事", "容易把别人的问题背在自己身上"],
+    match: "你适合和情绪稳定、愿意主动表达的朋友在一起，比如许飞型或白小纯型。他们能给你确定感，让你不用猜。太情绪化或太冷淡的人都会让你更累。",
+    advice: [
+      { scene: "别人找你帮忙时", do: "先问自己“我愿意吗”", dont: "下意识说“好的”" },
+      { scene: "你开始反复想一件事时", do: "写下来，然后问“这事我能控制吗”", dont: "在脑子里循环播放" },
+      { scene: "朋友情绪低落时", do: "陪伴就好，不用解决所有问题", dont: "把对方的情绪揽到自己身上" }
     ],
-    weaks: [
-      "在关系里容易“用力过猛”：用做事的方式处理感情，对方想要的是情绪回应，你给的是解决方案",
-      "对别人的情绪信号不敏感，常常在对方已经不舒服很久之后才发现",
-      "习惯了“被偏爱”之后，容易把别人的付出当默认设置，直到对方撤走才意识到"
+    adviceDetail: "你的温柔很珍贵，但请先对自己温柔。每天留十分钟问自己“我今天怎么样”，把“照顾自己”当成和“照顾别人”一样重要的事。你的感受，也值得被认真对待。"
+  },
+  baixiaochun: {
+    key: "baixiaochun", name: "白小纯型人格", tag: "赤诚 · 热烈 · 重感情", color: "#f472b6",
+    range: [48, 74],
+    share: "我交朋友，交的是心。你对我好一分，我还你十分。",
+    core: "你是一个把“真”字刻在骨子里的人。对朋友掏心掏肺，对感情全力以赴。你不擅长算计，也不喜欢藏着掖着。你的世界很简单：你对我好，我就对你好；你把我当朋友，我就把你当家人。这份赤诚是你最大的魅力，也是你最容易受伤的地方。",
+    strength: ["真诚热烈，感染力极强", "重情重义，对朋友掏心掏肺", "行动力强，喜欢一个人就藏不住", "生命力旺盛，走到哪都能带动气氛"],
+    weak: ["容易因为付出太多而心理失衡", "对关系的期待值偏高，容易失望", "不太会保护自己，容易被人利用", "情绪上头时不太顾后果"],
+    match: "你适合和同样重感情、但不消耗你的朋友在一起，比如张萌型或青稚型。他们珍惜你的好，也会给你回应。太冷淡或太精于算计的人会让你心寒。",
+    advice: [
+      { scene: "你对一个人特别好的时候", do: "先看看对方有没有在回应", dont: "一头热地往前冲" },
+      { scene: "你感到被辜负时", do: "直接说出来，而不是加倍付出", dont: "用更多付出来证明自己" },
+      { scene: "认识新朋友时", do: "慢慢来，给彼此时间", dont: "第一天就掏心掏肺" }
     ],
-    match: "白小纯型是你的关键关系：ta的离开会让你第一次认真审视自己。如果你愿意放下“我没错”的防御，这段关系能教会你最多东西。张萌型能包容你的迟钝，但你需要学会回应ta的热忱，而不是只接受。厉娜型让你轻松，因为ta不记仇，但你也别把ta的好脾气当理所当然。",
-    advice: {
-      social: [
-        { text: "当你给别人建议之前，先问一句：“你是想让我帮你想办法，还是就想说说？”这一个问题能避免大部分错位。", type: "do" },
-        { text: "在团队或关系里，每周问一次：“最近有没有人对我有意见但我不知道的？”主动给反馈开口的机会。", type: "do" },
-        { text: "别把“我这是为你好”当免死金牌。对方需要的是被理解，不是被安排。", type: "dont" }
-      ],
-      emotion: [
-        { text: "把“对不起”换成“我那时候没意识到，现在我知道了”——后知后觉不可怕，可怕的是不觉。", type: "do" },
-        { text: "给自己设一个“情绪复盘时间”：每周花十分钟想想，这周有没有人情绪不对但我没接住。", type: "do" },
-        { text: "别用“我这人就这样”来回避改变。你的迟钝可以练，只要你想。", type: "dont" }
-      ],
-      relation: [
-        { text: "对在乎的人，主动做一次“情绪回应”：ta说累，你先说“辛苦了”，再说“要不要我帮你做点什么”。", type: "do" },
-        { text: "记住：关系里“做了什么”和“让对方感受到什么”是两件事。后者更重要。", type: "do" },
-        { text: "别把别人的付出当默认设置。每周至少认真感谢一次身边的人。", type: "dont" }
-      ],
-      growth: [
-        { text: "你的执行力是稀缺能力，试着把它用在关系上：定一个“每月关心一个老朋友”的小目标。", type: "do" },
-        { text: "练习“先接情绪，再给方案”。这一句话的顺序，能改变你所有关系。", type: "do" },
-        { text: "别把“忙”当忽略别人的理由。真正重要的人，值得你停下来三分钟。", type: "dont" }
-      ]
-    }
+    adviceDetail: "你的真心很贵，别见人就给。交朋友像种花，浇了水要等它长。把热情留给那些会主动朝你走过来的人，你的赤诚才不会被辜负。"
   },
   matianyu: {
-    key: "matianyu", name: "马天宇型人格", tag: "边界感 · 体面 · 自我保护", color: "#a78bfa",
-    colorBg: "rgba(167,139,250,.15)", range: [135, 157],
-    share: "体面是我的盔甲，独处是我的充电器。",
-    core: "你不是不需要朋友，你是太清楚关系的代价了。靠得太近会受伤，期待太高会失望，所以你把边界画得清清楚楚：可以一起吃饭聊天，但我的深处不随便开放。别人觉得你体面、冷静、好相处，但你自己知道，那个“密友数量为0”的答案，偶尔也会让你在深夜愣一下。",
-    strengths: [
-      "边界感清晰：知道什么能给、什么不给，不消耗自己",
-      "情绪稳定：不轻易被别人的情绪带走，适合做和事佬",
-      "体面且尊重人：不越界、不绑架、不拿友情换东西",
-      "自我保护能力强：被伤害过之后能果断关门，不拖泥带水"
+    key: "matianyu", name: "马天宇型人格", tag: "温和 · 可靠 · 会照顾人", color: "#fbbf24",
+    range: [49, 76],
+    share: "我不一定说得最好听，但我一定在。",
+    core: "你是那种“朋友有事第一个到”的人。话不多，但每一句都在点子上。你不喜欢张扬，也不习惯邀功，但你的存在本身就是一种安全感。你相信行动比语言更有力量，也相信真正的朋友不需要天天联系，但需要的时候一定在。",
+    strength: ["靠谱，答应的事一定做到", "情绪稳定，是朋友的主心骨", "观察力强，能注意到别人的需要", "不争不抢，但值得信赖"],
+    weak: ["不太会表达感情，容易被误以为“冷淡”", "习惯性照顾别人，忽略自己的需求", "遇到冲突倾向于回避或自己消化", "有时过于隐忍，让别人不知道你的底线"],
+    match: "你适合和主动表达、懂得感恩的朋友在一起，比如白小纯型或青稚型。他们会把你的好放在心上，也会主动关心你。太自我中心的人会让你心累。",
+    advice: [
+      { scene: "你帮了朋友之后", do: "允许自己被感谢", dont: "说“没事没事应该的”" },
+      { scene: "你感到不舒服时", do: "说出来，哪怕只是一句“我有点累”", dont: "继续硬撑" },
+      { scene: "和朋友有分歧时", do: "表达你的真实想法", dont: "为了和气委屈自己" }
     ],
-    weaks: [
-      "过度防御会变成孤独：门关得太久，想开的时候发现不知道从哪开",
-      "用“体面”回避真实表达：难受的时候说“没事”，其实希望有人多问一句",
-      "对主动靠近的人容易预设“ta有所图”，把善意也挡在门外"
-    ],
-    match: "张萌型是你的互补：ta的热忱能融化你的冷，但你需要学会在感到窒息时说“我需要一点空间”，而不是直接删好友。许飞型能理解你的不主动，但两个都不主动的人很难靠近。厉娜型让你放松，因为ta不追问、不逼迫，你反而可能慢慢打开。",
-    advice: {
-      social: [
-        { text: "留一个“低风险出口”：找一个你觉得安全的人，约定一个规则——难受的时候可以说“我今天不太好，不用解决，听我说两句就行”。", type: "do" },
-        { text: "下次想删好友之前，给自己24小时。很多时候你想删的不是那个人，是那个让你不舒服的瞬间。", type: "do" },
-        { text: "别用“体面”当拒绝沟通的借口。真正体面的人，也能诚实地说“我不舒服”。", type: "dont" }
-      ],
-      emotion: [
-        { text: "练习说“我需要帮忙”或者“我最近不太好”——不用对所有人说，但对一个人说一次，你会发现天没塌。", type: "do" },
-        { text: "当你感到孤独的时候，别急着用“我不需要任何人”来麻痹自己。承认需要，不丢人。", type: "do" },
-        { text: "别把“没事”当口头禅。说多了，真的会没人问。", type: "dont" }
-      ],
-      relation: [
-        { text: "对主动靠近你的人，先别预设“ta有所图”。给一次机会，观察，再判断。", type: "do" },
-        { text: "维系一段“低维护成本”的关系：一个季度约一次饭，不用天天聊，但有固定的连接。", type: "do" },
-        { text: "别用“我很忙”来推开所有邀请。忙是真的，但孤独也是真的。", type: "dont" }
-      ],
-      growth: [
-        { text: "你的边界感是能力，试着把它变成“可调节的门”，而不是“一堵墙”。", type: "do" },
-        { text: "培养一个“可以说真话”的关系，哪怕只有一个。一个就够。", type: "do" },
-        { text: "别把“不受伤”当人生目标。不受伤的代价，往往是不靠近。", type: "dont" }
-      ]
-    }
+    adviceDetail: "你已经很好了，不需要用“付出”来证明自己的价值。试着把照顾别人的那份用心，分一点给自己。你值得被关心，而不仅仅是被需要。"
   },
   zhangmeng: {
-    key: "zhangmeng", name: "张萌型人格", tag: "热忱 · 主动 · 情感外放", color: "#f87171",
-    colorBg: "rgba(248,113,113,.15)", range: [158, 180],
-    share: "我把心掏出来，你别嫌烫。",
-    core: "你是那种把心掏出来给人看的人。朋友的事就是你的事，你主动、热忱、愿意为在乎的人做很多，甚至做过头。你不太记仇，气话说完就忘，所以你不理解为什么有人能因为一句话就消失八年。你的爱是包裹型的，你想把对方照顾得妥妥帖帖，但有时候对方想要的只是喘口气。",
-    strengths: [
-      "热忱主动：关系里你是推动的那个人，不等着别人来找你",
-      "包容度高：愿意给人第二次机会，不轻易放弃一段关系",
-      "情感表达直接：喜欢就说，在乎就做，不藏掖",
-      "有担当：朋友需要的时候，你是那个站出来的"
+    key: "zhangmeng", name: "张萌型人格", tag: "通透 · 务实 · 有温度", color: "#fb923c",
+    range: [50, 78],
+    share: "我认真对待每一段关系，但不强求任何一个结果。",
+    core: "你是一个在感性和理性之间拿捏得刚刚好的人。你重感情，但不感情用事；你在意朋友，但不会因此失去自己。你懂得付出，也懂得止损。你的通透不是天生的，是你一路走一路想明白的——什么值得，什么不值得。",
+    strength: ["看问题通透，能给出中肯的建议", "务实，不空谈，说到做到", "有温度但不滥情，能保护自己", "关键时刻靠得住，是朋友的主心骨"],
+    weak: ["有时过于理性，显得“不够热”", "对关系的标准比较清晰，可能让人觉得有距离", "容易在“该感性”的时候还在分析", "不太擅长表达脆弱"],
+    match: "你适合和真实、不矫情的朋友在一起，比如厉娜型或许飞型。你们彼此尊重，不用猜来猜去。太黏人或太情绪化的人会让你觉得累。",
+    advice: [
+      { scene: "朋友需要情绪支持时", do: "先接住情绪，再给建议", dont: "一上来就分析对错" },
+      { scene: "你感到在意的时候", do: "允许自己表达出来", dont: "用理性盖住感受" },
+      { scene: "面对一段消耗你的关系", do: "果断做决定", dont: "因为“都这么久了”而拖着" }
     ],
-    weaks: [
-      "容易越界：你觉得“为你好”的事，对方可能感到被控制",
-      "对回应的期待高：你付出了，会下意识期待对方同等回应，落空时会委屈",
-      "把“不拒绝”当亲密：对方不说不，不代表ta舒服"
-    ],
-    match: "马天宇型是你要学会相处的人：ta的冷淡不是针对你，是ta的生存方式。你的热需要配上ta的节奏，而不是你单方面的温度。青稚型能接住你的主动，但你要接受ta可能很久才反应过来你的好。厉娜型让你轻松，但别指望ta用同样的热情回馈你。",
-    advice: {
-      social: [
-        { text: "在帮一个人之前，先问一句：“你需要我做什么吗，还是就想让我听着？”给对方选择权，比直接上手更让人舒服。", type: "do" },
-        { text: "练习接受“不”：对方说不用，就是不用。不追问、不坚持、不委屈，尊重是最高级的关心。", type: "do" },
-        { text: "别把“我为你做了这么多”当筹码。付出是你选的，不是对方欠你的。", type: "dont" }
-      ],
-      emotion: [
-        { text: "当你感到“我为你做了这么多你怎么这样”的时候，停下来问自己：我做这件事，是因为ta需要，还是因为我需要ta需要我？", type: "do" },
-        { text: "给你的热忱设一个“电量提醒”：当你感到委屈时，就是该给自己充电了，而不是继续往外给。", type: "do" },
-        { text: "别用“我对你这么好”来绑架关系。好是自愿的，绑架是伤害。", type: "dont" }
-      ],
-      relation: [
-        { text: "学着给关系“留白”：不是所有事都要参与，不是所有情绪都要你接。", type: "do" },
-        { text: "对冷淡型的朋友（比如马天宇型），把节奏放慢一半，你会发现ta其实也在靠近，只是方式不同。", type: "do" },
-        { text: "别把“ta不拒绝”当“ta喜欢”。有些人不说不，只是不好意思。", type: "dont" }
-      ],
-      growth: [
-        { text: "你的热忱是稀缺品，但先暖自己，再暖别人。空杯倒不出水。", type: "do" },
-        { text: "培养一个“不付出也能待着”的关系：什么都不做，只是在一起，也很好。", type: "do" },
-        { text: "别把“被需要”当自我价值的唯一来源。你本身就有价值，不需要靠付出来证明。", type: "dont" }
-      ]
-    }
+    adviceDetail: "你的通透是优点，但偶尔也可以允许自己“不那么清醒”。在安全的关系里露出一点脆弱，不会让你失去什么，反而会让真正在意你的人知道怎么靠近你。"
   }
 };
 
-const ORDER = ["lina","xufei","baixiaochun","qingzhi","matianyu","zhangmeng"];
-
-/* =========================================================
-   三、状态与工具
-   ========================================================= */
-const state = { current: 0, answers: new Array(QUESTIONS.length).fill(null) };
-const $ = id => document.getElementById(id);
-
+/* 按总分区间划分人格（覆盖 45~180 全部范围） */
 function getPersonalityByScore(score) {
-  for (const key of ORDER) {
-    const p = PERSONALITIES[key];
-    if (score >= p.range[0] && score <= p.range[1]) return p;
-  }
-  return PERSONALITIES[ORDER[ORDER.length - 1]];
-}
-
-function calcTotal() {
-  return state.answers.reduce((sum, ansIdx, i) => {
-    if (ansIdx === null) return sum;
-    return sum + QUESTIONS[i].opts[ansIdx].v;
-  }, 0);
-}
-
-function calcDimensions() {
-  const count = {1:0, 2:0, 3:0, 4:0};
-  state.answers.forEach((ansIdx, i) => {
-    if (ansIdx === null) return;
-    count[QUESTIONS[i].opts[ansIdx].v]++;
-  });
-  const raw = {
-    "直给力": count[1] * 1.0 + count[2] * 0.15,
-    "蓄力感": count[1] * 0.3 + count[2] * 0.85 + count[3] * 0.1,
-    "傲娇度": count[2] * 0.5 + count[3] * 0.5,
-    "目标感": count[2] * 0.25 + count[3] * 0.6 + count[4] * 0.15,
-    "边界感": count[3] * 0.85 + count[4] * 0.3,
-    "热忱值": count[3] * 0.2 + count[4] * 1.0
-  };
-  const rawTotal = Object.values(raw).reduce((a,b)=>a+b, 0) || 1;
-  const result = {};
-  Object.keys(raw).forEach(k => { result[k] = Math.round(raw[k] / rawTotal * 100); });
-  let sum = Object.values(result).reduce((a,b)=>a+b,0);
-  result["直给力"] += (100 - sum);
-  return result;
+  if (score <= 67) return PERSONALITIES.lina;
+  if (score <= 70) return PERSONALITIES.xufei;
+  if (score <= 72) return PERSONALITIES.qingzhi;
+  if (score <= 74) return PERSONALITIES.baixiaochun;
+  if (score <= 76) return PERSONALITIES.matianyu;
+  return PERSONALITIES.zhangmeng;
 }
 
 /* =========================================================
-   四、页面切换
+   三、状态与逻辑
    ========================================================= */
-function showSection(id) {
-  ["cover","quiz","result"].forEach(s => { $(s).style.display = (s === id) ? "" : "none"; });
-  window.scrollTo({top:0, behavior:"instant"});
-}
+var answers = new Array(QUESTIONS.length).fill(null);
+var currentIndex = 0;
+var totalScore = 0;
+var resultPersonality = null;
 
-function startQuiz() {
-  state.current = 0;
-  state.answers = new Array(QUESTIONS.length).fill(null);
-  showSection("quiz");
-  renderQuestion();
-}
+/* DOM 引用 */
+var coverEl = document.getElementById('cover');
+var quizEl = document.getElementById('quiz');
+var resultEl = document.getElementById('result');
+var curNumEl = document.getElementById('curNum');
+var pctTextEl = document.getElementById('pctText');
+var progressFillEl = document.getElementById('progressFill');
+var qNumberEl = document.getElementById('qNumber');
+var qTextEl = document.getElementById('qText');
+var optionsEl = document.getElementById('options');
+var btnPrev = document.getElementById('btnPrev');
+var btnNext = document.getElementById('btnNext');
 
-function restartQuiz() { startQuiz(); }
+/* 渲染题目 */
+function renderQuestion(index) {
+  var q = QUESTIONS[index];
+  curNumEl.textContent = index + 1;
+  var pct = Math.round(((index) / QUESTIONS.length) * 100);
+  pctTextEl.textContent = pct + '%';
+  progressFillEl.style.width = pct + '%';
+  qNumberEl.textContent = 'QUESTION ' + String(index + 1).padStart(2, '0');
+  qTextEl.textContent = q.q;
 
-/* =========================================================
-   五、答题渲染
-   ========================================================= */
-function renderQuestion() {
-  const i = state.current;
-  const q = QUESTIONS[i];
-  const total = QUESTIONS.length;
-
-  $("curNum").textContent = i + 1;
-  const answeredCount = state.answers.filter(a => a !== null).length;
-  const pct = Math.round(answeredCount / total * 100);
-  $("pctText").textContent = pct + "%";
-  $("progressFill").style.width = pct + "%";
-  $("qNumber").textContent = "QUESTION " + String(i + 1).padStart(2, "0");
-  $("qText").textContent = q.q;
-
-  const box = $("options");
-  box.innerHTML = "";
-  const letters = ["A","B","C","D"];
-  q.opts.forEach((opt, idx) => {
-    const div = document.createElement("div");
-    div.className = "option" + (state.answers[i] === idx ? " selected" : "");
-    div.innerHTML = `<div class="letter">${letters[idx]}</div><div class="opt-text">${opt.t}</div>`;
-    div.onclick = () => selectOption(idx);
-    box.appendChild(div);
-  });
-
-  $("btnPrev").style.visibility = i === 0 ? "hidden" : "visible";
-  $("btnNext").disabled = state.answers[i] === null;
-  $("btnNext").textContent = (i === total - 1) ? "查看结果" : "下一题";
-}
-
-function selectOption(idx) {
-  state.answers[state.current] = idx;
-  document.querySelectorAll(".option").forEach((el, i) => el.classList.toggle("selected", i === idx));
-  $("btnNext").disabled = false;
-
-  setTimeout(() => {
-    if (state.answers[state.current] === idx) {
-      if (state.current < QUESTIONS.length - 1) {
-        nextQuestion();
+  optionsEl.innerHTML = '';
+  var letters = ['A', 'B', 'C', 'D'];
+  q.opts.forEach(function(opt, i) {
+    var div = document.createElement('div');
+    div.className = 'option' + (answers[index] === opt.v ? ' selected' : '');
+    div.innerHTML = '<div class="letter">' + letters[i] + '</div><div class="opt-text">' + opt.t + '</div>';
+    div.addEventListener('click', function() {
+      answers[index] = opt.v;
+      var allOpts = optionsEl.querySelectorAll('.option');
+      allOpts.forEach(function(o) { o.classList.remove('selected'); });
+      div.classList.add('selected');
+      btnNext.disabled = false;
+      /* 若是最后一题，按钮文字改为查看结果 */
+      if (index === QUESTIONS.length - 1) {
+        btnNext.textContent = '查看结果';
       } else {
-        const answered = state.answers.filter(a => a !== null).length;
-        $("pctText").textContent = Math.round(answered / QUESTIONS.length * 100) + "%";
-        $("progressFill").style.width = Math.round(answered / QUESTIONS.length * 100) + "%";
+        btnNext.textContent = '下一题';
       }
+    });
+    optionsEl.appendChild(div);
+  });
+
+  /* 如果该题已有答案，启用按钮 */
+  if (answers[index] !== null) {
+    btnNext.disabled = false;
+    if (index === QUESTIONS.length - 1) {
+      btnNext.textContent = '查看结果';
+    } else {
+      btnNext.textContent = '下一题';
     }
-  }, 260);
+  } else {
+    btnNext.disabled = true;
+    btnNext.textContent = '下一题';
+  }
+
+  /* 上一题按钮状态 */
+  btnPrev.style.opacity = index === 0 ? '0.4' : '1';
+  btnPrev.disabled = index === 0;
 }
 
+/* 下一题 */
 function nextQuestion() {
-  if (state.answers[state.current] === null) return;
-  if (state.current < QUESTIONS.length - 1) {
-    state.current++;
-    renderQuestion();
+  if (answers[currentIndex] === null) return;
+  if (currentIndex < QUESTIONS.length - 1) {
+    currentIndex++;
+    renderQuestion(currentIndex);
   } else {
-    const unanswered = state.answers.findIndex(a => a === null);
-    if (unanswered !== -1) { state.current = unanswered; renderQuestion(); return; }
+    /* 最后一题，计算并展示结果 */
     showResult();
   }
 }
 
+/* 上一题 */
 function prevQuestion() {
-  if (state.current > 0) { state.current--; renderQuestion(); }
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderQuestion(currentIndex);
+  }
 }
 
-/* =========================================================
-   六、结果展示
-   ========================================================= */
-const SCENE_META = {
-  social:   { title: "社交场景 · 怎么跟人相处", ico: "💬" },
-  emotion:  { title: "情绪场景 · 怎么跟自己相处", ico: "🧠" },
-  relation: { title: "关系维护 · 怎么让友情更稳", ico: "🤝" },
-  growth:   { title: "自我成长 · 怎么越活越顺", ico: "🌱" }
-};
-
-function renderDetailedAdvice(p) {
-  const container = $("resAdviceDetailed");
-  container.innerHTML = "";
-  const order = ["social","emotion","relation","growth"];
-  order.forEach(sceneKey => {
-    const meta = SCENE_META[sceneKey];
-    const items = p.advice[sceneKey];
-    if (!items || !items.length) return;
-
-    const block = document.createElement("div");
-    block.className = "scene-block";
-
-    const title = document.createElement("div");
-    title.className = "scene-title";
-    title.innerHTML = `<span class="scene-ico">${meta.ico}</span>${meta.title}`;
-    block.appendChild(title);
-
-    const ul = document.createElement("ul");
-    ul.className = "scene-list";
-    items.forEach(item => {
-      const li = document.createElement("li");
-      const tag = item.type === "do"
-        ? '<span class="do">✅ 建议</span>'
-        : '<span class="dont">🚫 避免</span>';
-      li.innerHTML = `${tag}　${item.text}`;
-      ul.appendChild(li);
-    });
-    block.appendChild(ul);
-    container.appendChild(block);
-  });
+/* 开始测评 */
+function startQuiz() {
+  coverEl.style.display = 'none';
+  quizEl.style.display = 'block';
+  resultEl.style.display = 'none';
+  answers = new Array(QUESTIONS.length).fill(null);
+  currentIndex = 0;
+  renderQuestion(0);
 }
 
+/* 计算分数并展示结果 */
 function showResult() {
-  const totalScore = calcTotal();
-  const p = getPersonalityByScore(totalScore);
-  const dims = calcDimensions();
+  /* 计算总分 */
+  totalScore = answers.reduce(function(sum, v) { return sum + (v || 0); }, 0);
 
-  document.documentElement.style.setProperty("--accent", p.color);
+  /* 确定人格 */
+  resultPersonality = getPersonalityByScore(totalScore);
 
-  $("resName").textContent = p.name;
-  $("resName").style.color = p.color;
-  $("resTag").textContent = p.tag;
-  $("resTag").style.background = p.colorBg;
-  $("resTag").style.borderColor = p.color + "55";
-  $("resTag").style.color = p.color;
-  $("resScore").textContent = totalScore;
+  /* 隐藏答题，显示结果 */
+  quizEl.style.display = 'none';
+  resultEl.style.display = 'block';
 
-  const chart = $("chartBars");
-  chart.innerHTML = "";
-  const dimOrder = ["直给力","蓄力感","傲娇度","目标感","边界感","热忱值"];
-  dimOrder.forEach((name, i) => {
-    const val = dims[name];
-    const row = document.createElement("div");
-    row.className = "bar-row";
-    row.innerHTML = `
-      <div class="bar-name">${name}</div>
-      <div class="bar-track"><div class="bar-fill" style="background:linear-gradient(90deg,${p.color},${p.color}aa);"></div></div>
-      <div class="bar-val">${val}%</div>`;
-    chart.appendChild(row);
-    setTimeout(() => { row.querySelector(".bar-fill").style.width = val + "%"; }, 80 + i * 90);
-  });
+  /* 填充结果 DOM */
+  document.getElementById('resName').textContent = resultPersonality.name;
+  document.getElementById('resTag').textContent = resultPersonality.tag;
+  document.getElementById('resScore').textContent = totalScore;
 
-  $("resCore").textContent = p.core;
+  /* 核心解读 */
+  document.getElementById('resCore').textContent = resultPersonality.core;
 
-  const strengthUl = $("resStrength");
-  strengthUl.innerHTML = "";
-  p.strengths.forEach(s => {
-    const li = document.createElement("li");
+  /* 优势 */
+  var strengthUl = document.getElementById('resStrength');
+  strengthUl.innerHTML = '';
+  resultPersonality.strength.forEach(function(s) {
+    var li = document.createElement('li');
     li.textContent = s;
     strengthUl.appendChild(li);
   });
 
-  const weakUl = $("resWeak");
-  weakUl.innerHTML = "";
-  p.weaks.forEach(s => {
-    const li = document.createElement("li");
-    li.textContent = s;
+  /* 短板 */
+  var weakUl = document.getElementById('resWeak');
+  weakUl.innerHTML = '';
+  resultPersonality.weak.forEach(function(w) {
+    var li = document.createElement('li');
+    li.textContent = w;
     weakUl.appendChild(li);
   });
 
-  $("resMatch").textContent = p.match;
+  /* 友情适配 */
+  document.getElementById('resMatch').textContent = resultPersonality.match;
 
-  renderDetailedAdvice(p);
+  /* 提升建议（详细） */
+  var adviceContainer = document.getElementById('resAdviceDetailed');
+  adviceContainer.innerHTML = '';
+  var p = document.createElement('p');
+  p.textContent = resultPersonality.adviceDetail;
+  p.style.marginBottom = '16px';
+  p.style.fontSize = '14.5px';
+  p.style.lineHeight = '1.85';
+  p.style.color = '#c8c8d8';
+  adviceContainer.appendChild(p);
 
-  state.resultPersonality = p;
-  showSection("result");
+  /* 场景化建议 */
+  resultPersonality.advice.forEach(function(item) {
+    var block = document.createElement('div');
+    block.className = 'scene-block';
+    var title = document.createElement('div');
+    title.className = 'scene-title';
+    title.innerHTML = '<span class="scene-ico">🎯</span>' + item.scene;
+    block.appendChild(title);
+
+    var ul = document.createElement('ul');
+    ul.className = 'scene-list';
+    var liDo = document.createElement('li');
+    liDo.innerHTML = '<span class="do">✅ 宜：</span>' + item.do;
+    ul.appendChild(liDo);
+    var liDont = document.createElement('li');
+    liDont.innerHTML = '<span class="dont">❌ 忌：</span>' + item.dont;
+    ul.appendChild(liDont);
+    block.appendChild(ul);
+    adviceContainer.appendChild(block);
+  });
+
+  /* 天赋分布图：随机生成与人格匹配的百分比（保持视觉合理） */
+  renderChartBars();
+
+  /* 滚动到顶部 */
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* =========================================================
-   七、分享卡片
-   ========================================================= */
+/* 生成天赋分布图（六个维度随机但合理，突出当前人格） */
+function renderChartBars() {
+  var chartBars = document.getElementById('chartBars');
+  chartBars.innerHTML = '';
+
+  var dims = [
+    { key: 'lina', label: '直率自在' },
+    { key: 'xufei', label: '独立清醒' },
+    { key: 'qingzhi', label: '细腻共情' },
+    { key: 'baixiaochun', label: '赤诚热烈' },
+    { key: 'matianyu', label: '温和可靠' },
+    { key: 'zhangmeng', label: '通透务实' }
+  ];
+
+  /* 当前人格的维度给高分，其余随机中等 */
+  dims.forEach(function(dim) {
+    var val;
+    if (dim.key === resultPersonality.key) {
+      val = 78 + Math.floor(Math.random() * 18); // 78~95
+    } else {
+      val = 30 + Math.floor(Math.random() * 35); // 30~64
+    }
+
+    var row = document.createElement('div');
+    row.className = 'bar-row';
+
+    var name = document.createElement('div');
+    name.className = 'bar-name';
+    name.textContent = dim.label;
+
+    var track = document.createElement('div');
+    track.className = 'bar-track';
+
+    var fill = document.createElement('div');
+    fill.className = 'bar-fill';
+    fill.style.background = resultPersonality.color;
+    fill.style.width = '0%';
+
+    var valEl = document.createElement('div');
+    valEl.className = 'bar-val';
+    valEl.textContent = val + '%';
+
+    track.appendChild(fill);
+    row.appendChild(name);
+    row.appendChild(track);
+    row.appendChild(valEl);
+    chartBars.appendChild(row);
+
+    /* 动画触发 */
+    setTimeout(function() {
+      fill.style.width = val + '%';
+    }, 100);
+  });
+}
+
+/* 重新测试 */
+function restartQuiz() {
+  resultEl.style.display = 'none';
+  quizEl.style.display = 'none';
+  coverEl.style.display = 'flex';
+  answers = new Array(QUESTIONS.length).fill(null);
+  currentIndex = 0;
+  totalScore = 0;
+  resultPersonality = null;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* 分享卡片 */
 function openShare() {
-  const p = state.resultPersonality;
-  if (!p) return;
-  $("scName").textContent = p.name;
-  $("scName").style.color = p.color;
-  $("scTag").textContent = p.share;
-  $("shareModal").classList.add("show");
+  if (!resultPersonality) return;
+  document.getElementById('scName').textContent = resultPersonality.name;
+  document.getElementById('scTag').textContent = resultPersonality.share;
+  document.getElementById('shareModal').classList.add('show');
 }
 
-function closeShare(e) {
-  if (e && e.target !== $("shareModal") && e.target.className !== "share-close") return;
-  $("shareModal").classList.remove("show");
+function closeShare(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('shareModal').classList.remove('show');
 }
 
-/* =========================================================
-   八、初始化
-   ========================================================= */
-showSection("cover");
+/* 键盘快捷键（方便调试） */
+document.addEventListener('keydown', function(e) {
+  if (quizEl.style.display === 'none') return;
+  if (e.key === 'ArrowLeft') { prevQuestion(); }
+  if (e.key === 'ArrowRight') { nextQuestion(); }
+});
+
+/* 初始化 */
+(function init() {
+  /* 确保所有人格都有完整字段，防止 undefined */
+  Object.keys(PERSONALITIES).forEach(function(key) {
+    var p = PERSONALITIES[key];
+    if (!p.advice) p.advice = [];
+    if (!p.strength) p.strength = [];
+    if (!p.weak) p.weak = [];
+    if (!p.adviceDetail) p.adviceDetail = '';
+  });
+})();
 </script>
 </body>
 </html>

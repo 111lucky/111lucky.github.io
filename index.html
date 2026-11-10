@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>你是后会友期里的谁｜趣味人格测评</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>你是后会友期里的谁 - 趣味人格测评</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:"PingFang SC",system-ui,sans-serif;}
@@ -480,11 +483,12 @@ function nextQuestion(){
     alert("请选择一个答案！");
     return;
   }
-  if(currentQ < questions.length-1){
+  // 修复判断：到最后一题，直接计算结果
+  if(currentQ >= questions.length - 1){
+    calcResult();
+  }else{
     currentQ++;
     renderQuestion();
-  }else{
-    calcResult();
   }
 }
 function calcResult(){
@@ -509,7 +513,7 @@ function calcResult(){
   // 渲染文字
   document.getElementById("resMainName").innerText = data.name;
   document.getElementById("resSlogan").innerText = data.slogan;
-  document.getElementById("resSub").innerText = `✨你的隐藏副人格：${resultData[sub.key].name}`;
+  document.getElementById("resSub").innerText = "✨你的隐藏副人格："+resultData[sub.key].name;
   document.getElementById("resText1").innerText = data.t1;
   document.getElementById("resText2").innerText = data.t2;
   document.getElementById("resText3").innerText = data.t3;
